@@ -3,6 +3,43 @@ import pytest
 import compose.can_id as ci
 
 
+@pytest.mark.parametrize('arbitration_field, implemented')
+def test_information_requests(arbitration_field: int, implemented: int):
+    ...
+
+
+@pytest.mark.parametrize('hc_msg, module_id, implemented',
+                         [
+                            (ci.SwitchMatrixMessages, 1, 1000010),
+                             (ci.SwitchMatrixMessages, 2, 1000100),
+                             (ci.SwitchMatrixMessages, 3, 1000110),
+                             (ci.SwitchMatrixMessages, 4, 1001000),
+                             (ci.SwitchMatrixMessages, 5, 1001010),
+                             (ci.SwitchMatrixMessages, 6, 1001100),
+                             (ci.SwitchMatrixMessages, 7, 1001110),
+                             (ci.SwitchMatrixMessages, 8, 1010000),
+                             (ci.SwitchMatrixMessages, 9, 1010010),
+                             (ci.SwitchMatrixMessages, 10, 1010100),
+                             (ci.SwitchMatrixMessages, 11, 1010110),
+                             (ci.SwitchMatrixMessages, 12, 1011000),
+                             (ci.SwitchMatrixMessages, 13, 1011010),
+                             (ci.SwitchMatrixMessages, 14, 1011100),
+                             (ci.SwitchMatrixMessages, 15, 1011110),
+                             (ci.SwitchMatrixMessages, 16, 1100000),
+                             (ci.SwitchMatrixMessages, 17, 1100010),  # Todo: why does this module id correspond to nonexisting nr. 17?
+
+                         ]
+                         )
+def test_switchmatrix_messages(hc_msg: ci.HealthcareSwitchmatrixMessage, module_id: int, implemented: str) -> None:
+    result = ci.CanId(hc_msg, module_id)
+    assert result.__repr__() == implemented
+    if result._message.direction == ci.Direction.master_to_module:
+        assert result._message.direction.value == 0
+    else:
+        assert result._message.direction.value == 1
+
+
+
 @pytest.mark.parametrize('hc_msg, module_id, implemented',
                          [
                              (ci.HealthcareMessages.update_msg1, None, '10000000'),
@@ -108,7 +145,7 @@ import compose.can_id as ci
                                  (ci.HealthcareMessages.msg6, 15, '111011111'),
                                  (ci.HealthcareMessages.msg6, 16, '111100001')
 ])
-def test_healthcare_messages(hc_msg: ci.CanMessage, module_id: int, implemented: str) -> None:
+def test_healthcare_messages(hc_msg: ci.HealthcareSwitchmatrixMessage, module_id: int, implemented: str) -> None:
     result = ci.CanId(hc_msg, module_id)
     assert result.__repr__() == implemented
     if result._message.direction == ci.Direction.master_to_module:
