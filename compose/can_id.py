@@ -1,9 +1,9 @@
+from collections import namedtuple
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, List, Union
+from typing import List, Optional, Union
 
 import pretty_tables
-from collections import namedtuple
 
 
 # CanMessage = namedtuple("healthcare_message", "hc_id direction update_interval type payload information")

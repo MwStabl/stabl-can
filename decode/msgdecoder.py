@@ -1,7 +1,7 @@
 from typing import Optional
 
+from common.can import StablCanMsg
 from common.codebook import Devices, msg_dict
-from common.getter import StablCanMsg
 
 
 class Codebook:

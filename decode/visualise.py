@@ -1,4 +1,4 @@
-from common.getter import StablCanMsg
+from common.can import StablCanMsg
 from decode.msgdecoder import decode
 
 
