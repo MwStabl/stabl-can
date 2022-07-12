@@ -10,11 +10,15 @@ def _beautify_arbitration_field(arbitration_field: int) -> str:
     module_id = raw[-6:-1]
     healthcare_id = raw[2:-6]
     free_bits = raw[:2]
-    return f"{free_bits}-{healthcare_id}-{module_id}-{direction}"
+    hexcode = f"0x{arbitration_field:03x}"
+    return f"{free_bits}-{healthcare_id}-{module_id}-{direction} ({hexcode})"
 
 
 def _beautify_paylad(payload: list) -> str:
-    return " ".join([f"{i:02x}" for i in payload])
+    useful = " ".join([f"{i:02x}" for i in payload])
+    while len(useful) < 8*2+7:
+        useful += " --"
+    return useful
 
 
 def visualise(message: StablCanMsg) -> str:

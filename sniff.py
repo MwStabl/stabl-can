@@ -1,23 +1,41 @@
 from time import sleep
 
+import click
+from termcolor import cprint
+
 from common.can import StablCanBus
 from common.modbus import Modbus
 from decode.visualise import visualise
 
-if __name__ == "__main__":
-    can = StablCanBus()
-    modbus = Modbus()
-    for bus in [can, modbus]:
-        bus.start()
+
+@click.command()
+@click.option("--canbus", is_flag=True, help="Capture CAN outputs")
+@click.option("--modbus", is_flag=True, help="Capture Modbus (over uart) outputs")
+def main(canbus: bool, modbus: bool) -> None:
+    if canbus:
+        cprint("can message", 'red')
+        can = StablCanBus()
+        can.start()
+    if modbus:
+        cprint("modbus message", 'green')
+        mod = Modbus()
+        mod.start()
+    print('\n')
     try:
         while True:
-            if can.new_msg:
-                print(visualise(can.get_new_message()))
-            if modbus.new_msg:
-                print(modbus.get_new_message())
+            if canbus and can.new_msg:
+                cprint(visualise(can.get_new_message()), 'red')
+            if modbus and mod.new_msg:
+                cprint(mod.get_new_message(), 'green')
             sleep(0.1)
     except KeyboardInterrupt:
         print("End")
     finally:
-        for bus in [can, modbus]:
-            bus.terminate()
+        if canbus:
+            can.terminate()
+        if modbus:
+            mod.terminate()
+
+
+if __name__ == "__main__":
+    main()

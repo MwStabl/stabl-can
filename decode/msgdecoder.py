@@ -40,7 +40,8 @@ msgs_from_module = {
             "_type": "RESET Condition",
             0x05: "RESET_ERROR_BOR"
         },
-        0x24: "Initialisation Step .."
+        0x24: "Initialisation Step ..",
+        0x0b: "State switch confirmation"
     }
 }
 
@@ -63,6 +64,9 @@ def msg_from_master(message: StablCanMsg) -> Optional[str]:
 
 def msg_from_module(message: StablCanMsg) -> Optional[str]:
     try:
+        if (message.arbitration_id & 0b11111000000) == 0b11111000000:
+            log = "".join([chr(c) for c in message.data])
+            return f'Log: {log}'
         val = msgs_from_module["module_id"][message.data[0]]
         if isinstance(val, dict):
             return f'{val["_type"]}: {val[message.data[1]]}'

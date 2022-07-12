@@ -3,5 +3,7 @@
 script_path=$(dirname $(readlink -f $0))
 cd $script_path
 
-source venv/bin/activate
-jupyter lab
+conda init bash
+conda activate pealcan
+
+python3 sniff.py --canbus
