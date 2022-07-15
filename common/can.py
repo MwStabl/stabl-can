@@ -11,7 +11,9 @@ from common.codebook import Devices
 def print_setupinfo() -> None:
     print("CAN Bus cannot be initialised. Check the following requirements")
     print("1. Is the PEAK Can connected? Does the red light blink?")
-    print("2. Check wheter pcan is initialised with 'lsmod | grep ^peak'. If not, run 'modprobe peak_usb' and check again")
+    print(
+        "2. Check wheter pcan is initialised with 'lsmod | grep ^peak'. If not, run 'modprobe peak_usb' and check again"
+    )
     print("3. Initialise the CAN: 'ip link set can0 up type can bitrate 500000'")
 
 
@@ -32,7 +34,7 @@ class StablCanBus(Thread):
     def __init__(self):
         super().__init__()
         try:
-            self._can = can.interface.Bus(bustype='socketcan', channel=self._channel(), bitrate=self._bitrate())
+            self._can = can.interface.Bus(bustype="socketcan", channel=self._channel(), bitrate=self._bitrate())
         except Exception:
             print_setupinfo()
             exit()
@@ -45,7 +47,7 @@ class StablCanBus(Thread):
 
     def _channel(self) -> str:
         """stub for a function that identifies peakcan"""
-        return 'can0'
+        return "can0"
 
     def _bitrate(self) -> int:
         """stub for a function that reads the selected bitrate from c code or some config structure"""
@@ -73,7 +75,6 @@ class StablCanBus(Thread):
     def get_received_message(self) -> Optional[StablCanMsg]:
         try:
             msg = self._can.recv(1)
-            if msg is not None:
-                return StablCanMsg(msg)
+            return StablCanMsg(msg)
         except can.CanOperationError as e:
             print(f"CAN: Error catched: {e}")

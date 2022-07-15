@@ -5,7 +5,7 @@ from serial import Serial
 
 
 class Modbus(Thread):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._running = False
         self._bus = self._create_bus()
@@ -13,23 +13,20 @@ class Modbus(Thread):
         self._new_msg: bool = False
 
     def _create_bus(self) -> Serial:
-        return Serial(
-            baudrate=38400,
-            port='/dev/ttyACM0'
-        )
+        return Serial(baudrate=38400, port="/dev/ttyACM0")
 
     @property
-    def new_msg(self):
+    def new_msg(self) -> bool:
         return self._buffer.not_empty
 
     def get_new_message(self) -> str:
         return self._buffer.get()
 
-    def terminate(self):
+    def terminate(self) -> None:
         self._bus.close()
         self._running = False
 
-    def run(self):
+    def run(self) -> None:
         self._running = True
         while self._running:
             try:

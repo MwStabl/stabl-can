@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 120
-target-version = ['py36', 'py37', 'py38']
+target-version = ['py36', 'py37', 'py38', 'py39']
 include = '\.pyi?$'
 exclude = '''
 \(
@@ -24,3 +24,19 @@ include_trailing_comma = true
 line_length = 120
 multi_line_output = 3
 use_parentheses = true
+
+[tool.mypy]
+exclude = '''
+\(
+    \.git
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | venv
+    | \.gitlab
+\)
+'''

@@ -16,7 +16,7 @@ def _beautify_arbitration_field(arbitration_field: int) -> str:
 
 def _beautify_paylad(payload: list) -> str:
     useful = " ".join([f"{i:02x}" for i in payload])
-    while len(useful) < 8*2+7:
+    while len(useful) < 8 * 2 + 7:
         useful += " --"
     return useful
 
