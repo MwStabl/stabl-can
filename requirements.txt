@@ -1,4 +1,9 @@
-pytest
-pyserial
-termcolor
-click
+pytest~=7.1.2
+pyserial~=3.5
+termcolor~=1.1.0
+click~=8.0.4
+
+python-can~=4.0.0
+npyscreen~=4.10.5
+minimalmodbus~=2.0.1
+pymodbustcp~=0.2.0
