@@ -1,3 +1,4 @@
+from pathlib import Path
 from queue import Queue
 from threading import Thread
 from time import sleep
@@ -13,27 +14,41 @@ class NoSources(Exception):
     pass
 
 
+class RequiredDeviceNotAvailable(Exception):
+    pass
+
+
 class Collector(Thread):
-    def __init__(self) -> None:
+    def __init__(self, logfile: Path, canbus: bool, modbus: bool, uoc: bool) -> None:
         super().__init__()
-        self._global_buffer = []
-        self._sources = self._get_sources()
+        self._logfile = logfile
+        self._global_buffer: list = []
+        self._sources = self._get_sources(canbus, modbus, uoc)
         self._running = False
 
-    def _get_sources(self) -> Dict[Datasource, StablDatasource]:
+    @staticmethod
+    def _get_sources(
+        require_canbus: bool, require_modbus: bool, require_uoc: bool
+    ) -> Dict[Datasource, StablDatasource]:
         sources = {}
         try:
             sources[Datasource.Modbus] = StablModbus()
         except Exception as e:
             print(f"Modbus not available: {e}")
+            if require_modbus:
+                raise RequiredDeviceNotAvailable("modbus")
         try:
             sources[Datasource.Canbus] = StablCanBus()
         except Exception as e:
             print(f"Can Capture not available: {e}")
+            if require_canbus:
+                raise RequiredDeviceNotAvailable("canbus")
         try:
             sources[Datasource.UoC] = StablUartOverCan()
         except Exception as e:
             print(f"UoC Capture not available: {e}")
+            if require_uoc:
+                raise RequiredDeviceNotAvailable("uoc")
         if not sources:
             raise NoSources
         return sources
@@ -52,8 +67,13 @@ class Collector(Thread):
                 if source.new_msg:
                     new_msg = source.get_new_message()
                     self._global_buffer.append(new_msg)
+                    self.log_message(str(new_msg))
                     print(new_msg)
             sleep(0.01)
+
+    def log_message(self, message: str) -> None:
+        with open(self._logfile, "a") as logfile:
+            logfile.write(message.strip() + "\n")
 
     def terminate(self) -> None:
         self._running = False

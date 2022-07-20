@@ -73,6 +73,7 @@ def decode(message: StablCanMsg) -> Optional[str]:
         return msg_from_module(message)
     else:
         print("no such device")
+        return None
 
 
 def get_message_type(message: StablCanMsg) -> MsgType:

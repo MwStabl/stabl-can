@@ -10,18 +10,18 @@ class Datasource(Enum):
 
 
 class StablDatasource(Thread):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self._buffer = Queue()
+        self._buffer: Queue = Queue()
 
     def terminate(self) -> None:
         raise NotImplementedError
 
     @property
-    def new_msg(self):
+    def new_msg(self) -> bool:
         return not self._buffer.empty()
 
-    def get_new_message(self):
+    def get_new_message(self):  # type: ignore
         return self._buffer.get()
 
     def run(self) -> None:

@@ -26,7 +26,7 @@ class StablModbus(StablDatasource):
     prompt = ""
     error_counter = 0
 
-    def __init__(self, prompt=""):
+    def __init__(self, prompt: str = "") -> None:
         super().__init__()
         self._modbus_lock = Lock()
         self._modbus = self._setupModbus()
@@ -55,10 +55,10 @@ class StablModbus(StablDatasource):
             self._modbus.write_multiple_registers(MODBUS_HOLDING_CMD_ADDR - 1, valuelist)
             self._modbus_lock.release()
 
-    def setInterval(self, interval):
+    def setInterval(self, interval: float) -> None:
         self.interval = interval
 
-    def getAndPrintLogBuffer(self, idx):
+    def getAndPrintLogBuffer(self, idx) -> None:  # type: ignore
         bufferaddr = int(MODBUS_INPUT_LOGBUF_ADDR + ((idx * LOG_BUFFER_SIZE) / 2))
 
         reglist = self._modbus.read_input_registers(bufferaddr - 1, int(LOG_BUFFER_SIZE / 2))
@@ -67,7 +67,7 @@ class StablModbus(StablDatasource):
         bytestring = minimalmodbus._valuelist_to_bytestring(reglist, int(LOG_BUFFER_SIZE / 2))
         print(minimalmodbus._bytestring_to_textstring(bytestring, int(LOG_BUFFER_SIZE / 2)))
 
-    def _addToBuffer(self, idx):
+    def _addToBuffer(self, idx) -> None:  # type: ignore
         bufferaddr = int(MODBUS_INPUT_LOGBUF_ADDR + ((idx * LOG_BUFFER_SIZE) / 2))
 
         reglist = self._modbus.read_input_registers(bufferaddr - 1, int(LOG_BUFFER_SIZE / 2))
@@ -77,7 +77,7 @@ class StablModbus(StablDatasource):
         message = minimalmodbus._bytestring_to_textstring(bytestring, int(LOG_BUFFER_SIZE / 2))
         self._buffer.put(message)
 
-    def run(self):
+    def run(self) -> None:
         self.running = True
         while self.running:
             time.sleep(self.interval)
@@ -122,13 +122,13 @@ class StablModbus(StablDatasource):
 
             self._modbus_lock.release()
 
-    def terminate(self):
+    def terminate(self) -> None:
         self.running = False
         self.join()
 
 
 # only call from within lockbus lock
-def reconnect_modbus(modbus_client):
+def reconnect_modbus(modbus_client: ModbusClient) -> None:
     modbus_client.close()
     if not modbus_client.is_open:
         reconnect_counter = 0

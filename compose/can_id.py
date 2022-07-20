@@ -6,8 +6,8 @@ from typing import List, Optional, Union
 
 # CanMessage = namedtuple("healthcare_message", "hc_id direction update_interval type payload information")
 class Direction(Enum):
-    master_to_module: int = 0
-    module_to_master: int = 1
+    master_to_module = 0
+    module_to_master = 1
 
 
 @dataclass
@@ -15,7 +15,7 @@ class CanMessage:
     update_interval: Optional[int]
     type: str
     payload_length: int
-    direction: int
+    direction: Direction
     payload: List[Union[str, int]]
 
 
@@ -421,7 +421,7 @@ class MasterInfoMessages:
 
 
 class CanId:
-    def __init__(self, message: HealthcareSwitchmatrixMessage, module_id: Optional[int] = None) -> None:
+    def __init__(self, message: HealthcareSwitchmatrixMessage, module_id: int) -> None:
         self._message = message
         self._module_id = module_id
 

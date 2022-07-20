@@ -4,7 +4,7 @@ from streams.datasource import StablDatasource
 
 
 class StablUartOverCan(StablDatasource):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
     def run(self) -> None:
