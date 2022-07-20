@@ -1,9 +1,7 @@
-from threading import Timer
-
 import npyscreen
 
-from common.can import StablCanBus
 from decode.visualise import visualise
+from streams.canbus import StablCanBus
 
 
 class FifoBuffer(list):

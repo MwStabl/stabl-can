@@ -3,14 +3,14 @@ from time import sleep
 import click
 from termcolor import cprint
 
-from common.can import StablCanBus
 from common.modbus import Modbus
 from decode.visualise import visualise
+from streams.canbus import StablCanBus
 
 
 @click.command()
-@click.option("--canbus", is_flag=True, help="Capture CAN outputs")
-@click.option("--modbus", is_flag=True, help="Capture Modbus (over uart) outputs")
+@click.option("--canbus", "-c", is_flag=True, default=True, help="Capture CAN outputs")
+@click.option("--modbus", "-m", is_flag=True, default=False, help="Capture Modbus (over uart) outputs")
 def main(canbus: bool, modbus: bool) -> None:
     if canbus:
         cprint("can message", "red")
@@ -24,7 +24,7 @@ def main(canbus: bool, modbus: bool) -> None:
     try:
         while True:
             if canbus and can.new_msg:
-                cprint(visualise(can.get_new_message()), "red")
+                visualise(can.get_new_message())
             if modbus and mod.new_msg:
                 cprint(mod.get_new_message(), "green")
             sleep(0.001)

@@ -1,11 +1,11 @@
-from datetime import datetime
 from queue import Queue
 from threading import Thread
 from typing import Optional
 
 import can
 
-from common.codebook import Devices
+from decode.msgdecoder import StablCanMsg
+from streams.datasource import StablDatasource
 
 
 def print_setupinfo() -> None:
@@ -17,29 +17,11 @@ def print_setupinfo() -> None:
     print("3. Initialise the CAN: 'ip link set can0 up type can bitrate 500000'")
 
 
-class StablCanMsg:
-    def __init__(self, message: can.Message):
-        self._message = message
-        if message.arbitration_id & 1:
-            self.sender = Devices.Module
-        else:
-            self.sender = Devices.Master
-        self.arbitration_id = message.arbitration_id
-        self.data = list(message.data)
-        self.dlc = message.dlc
-        self.timestamp: datetime = datetime.fromtimestamp(message.timestamp)
-
-
-class StablCanBus(Thread):
+class StablCanBus(StablDatasource):
     def __init__(self):
         super().__init__()
-        try:
-            self._can = can.interface.Bus(bustype="socketcan", channel=self._channel(), bitrate=self._bitrate())
-        except Exception:
-            print_setupinfo()
-            exit()
+        self._can = can.interface.Bus(bustype="socketcan", channel=self._channel(), bitrate=self._bitrate())
         self._running: bool = False
-        self._buffer = Queue()
 
     @property
     def bus(self):
@@ -52,13 +34,6 @@ class StablCanBus(Thread):
     def _bitrate(self) -> int:
         """stub for a function that reads the selected bitrate from c code or some config structure"""
         return 500000
-
-    @property
-    def new_msg(self):
-        return self._buffer.not_empty
-
-    def get_new_message(self) -> StablCanMsg:
-        return self._buffer.get()
 
     def terminate(self) -> None:
         self._can.shutdown()
@@ -75,6 +50,8 @@ class StablCanBus(Thread):
     def get_received_message(self) -> Optional[StablCanMsg]:
         try:
             msg = self._can.recv(1)
-            return StablCanMsg(msg)
+            if msg is not None:
+                return StablCanMsg(msg)
         except can.CanOperationError as e:
             print(f"CAN: Error catched: {e}")
+            return None
