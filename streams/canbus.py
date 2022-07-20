@@ -1,11 +1,12 @@
-from queue import Queue
-from threading import Thread
+import logging
 from typing import Optional
 
 import can
 
 from decode.msgdecoder import StablCanMsg
 from streams.datasource import StablDatasource
+
+LOG = logging.getLogger(__name__)
 
 
 def print_setupinfo() -> None:
@@ -19,6 +20,7 @@ def print_setupinfo() -> None:
 
 class StablCanBus(StablDatasource):
     def __init__(self):
+        LOG.debug("init can")
         super().__init__()
         self._can = can.interface.Bus(bustype="socketcan", channel=self._channel(), bitrate=self._bitrate())
         self._running: bool = False
