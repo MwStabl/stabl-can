@@ -4,10 +4,10 @@ from threading import Thread
 from time import sleep
 from typing import Dict, List
 
-from streams.canbus import StablCanBus
-from streams.datasource import Datasource, StablDatasource
-from streams.modbus import StablModbus
-from streams.uart_over_can import StablUartOverCan
+from communicator.streams.canbus import StablCanBus
+from communicator.streams.datasource import Datasource, StablDatasource
+from communicator.streams.modbus import StablModbus
+from communicator.streams.uart_over_can import StablUartOverCan
 
 
 class NoSources(Exception):
@@ -79,3 +79,8 @@ class Collector(Thread):
         self._running = False
         for source in self._sources.values():
             source.terminate()
+
+
+
+class Visualisation:
+    ...

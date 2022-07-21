@@ -1,7 +1,7 @@
 from serial import Serial
 from yaml import safe_load
 
-from streams.datasource import StablDatasource
+from communicator.streams.datasource import StablDatasource
 
 
 def get_config() -> dict:

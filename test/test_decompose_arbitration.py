@@ -1,6 +1,6 @@
 import pytest
 
-from decode import visualise
+from communicator.decode import visualise
 
 
 @pytest.mark.parametrize(

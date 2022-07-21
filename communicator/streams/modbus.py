@@ -17,8 +17,8 @@ from threading import Lock, Thread
 import minimalmodbus
 from pyModbusTCP.client import ModbusClient
 
-from streams.datasource import StablDatasource
-from streams.settings import *
+from communicator.streams.datasource import StablDatasource
+from communicator.streams.settings import *
 
 
 class StablModbus(StablDatasource):

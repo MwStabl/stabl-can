@@ -3,8 +3,8 @@ from typing import Optional
 
 import can
 
-from decode.msgdecoder import StablCanMsg
-from streams.datasource import StablDatasource
+from communicator.decode.msgdecoder import StablCanMsg
+from communicator.streams.datasource import StablDatasource
 
 LOG = logging.getLogger(__name__)
 

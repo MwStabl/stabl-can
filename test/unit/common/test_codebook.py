@@ -3,7 +3,7 @@ from typing import Generator
 
 import pytest
 
-from common.codebook import Codebook
+from communicator.common import Codebook
 
 can_info_messages_h = """
 //

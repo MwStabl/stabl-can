@@ -1,13 +1,11 @@
-import re
 from datetime import datetime
 from enum import Enum
-from pathlib import Path
-from typing import Dict, Optional
+from typing import Optional
 
 import can
 from termcolor import colored
 
-from common.codebook import Devices
+from communicator.common.codebook import Devices
 
 msgs_from_master = {
     0x24: {
