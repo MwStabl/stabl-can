@@ -28,7 +28,7 @@ LOG = logging.getLogger(__name__)
 
 
 class StablLogger:
-    def __init__(self, log_path: Path = Path('logs')):
+    def __init__(self, log_path: Path = Path("logs")) -> None:
         LOG = logging.getLogger("STABL")
         self.logfile = Path(f"{log_path}/error.log")
         handler = logging.FileHandler(self.logfile)
@@ -37,25 +37,3 @@ class StablLogger:
         formatter.datefmt = "%d.%m.%Y %H:%M:%S"
         handler.setFormatter(formatter)
         LOG.addHandler(handler)
-
-    def __init__3(self, log_path: Path = Path('logs')):
-        self.logfile = Path(f"{log_path}/error.log")
-        logging.basicConfig(
-            filename=self.logfile,
-            filemode='w',
-            format="%(asctime)s %(levelname)s: %(name)s: %(message)s",
-            level=logging.DEBUG,
-        )
-
-    def __init__2(self, log_path: Path = Path('logs')):
-        project_logger = logging.getLogger("STABL Communicator")
-        self.logfile = Path(f"{log_path}/error.log")
-        logging.basicConfig(
-            filename=self.logfile,
-            filemode='w',
-            format="%(asctime)s %(levelname)s: %(name)s: %(message)s",
-            level=logging.DEBUG,
-            datefmt="%m.%d.%Y %H:%M:%S",
-        )
-        StablLogfileHandler(project_logger)
-

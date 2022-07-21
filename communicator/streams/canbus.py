@@ -4,7 +4,7 @@ from typing import Optional
 import can
 
 from communicator.decode.msgdecoder import StablCanMsg
-from communicator.streams.datasource import StablDatasource
+from communicator.streams.datasource import Datasource, GenericMessage, StablDatasource
 
 LOG = logging.getLogger(__name__)
 
@@ -38,8 +38,8 @@ class StablCanBus(StablDatasource):
         return 500000
 
     def terminate(self) -> None:
-        self._can.shutdown()
         self._running = False
+        self._can.shutdown()
 
     def run(self) -> None:
         self._running = True
@@ -49,11 +49,14 @@ class StablCanBus(StablDatasource):
                 self._buffer.put(msg)
         print("Closing CAN Bus")
 
-    def get_received_message(self) -> Optional[StablCanMsg]:
+    def get_received_message(self) -> Optional[GenericMessage]:
         try:
             msg = self._can.recv(1)
             if msg is not None:
-                return StablCanMsg(msg)
+                canmsg = StablCanMsg(msg)
+                return GenericMessage(
+                    content=canmsg.__repr__(), classification=canmsg.type, datasource=Datasource.Canbus
+                )
         except can.CanOperationError as e:
             print(f"CAN: Error catched: {e}")
             return None

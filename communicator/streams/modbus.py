@@ -17,7 +17,7 @@ from threading import Lock, Thread
 import minimalmodbus
 from pyModbusTCP.client import ModbusClient
 
-from communicator.streams.datasource import StablDatasource
+from communicator.streams.datasource import Datasource, GenericMessage, MessageType, StablDatasource
 from communicator.streams.settings import *
 
 
@@ -58,15 +58,6 @@ class StablModbus(StablDatasource):
     def setInterval(self, interval: float) -> None:
         self.interval = interval
 
-    def getAndPrintLogBuffer(self, idx) -> None:  # type: ignore
-        bufferaddr = int(MODBUS_INPUT_LOGBUF_ADDR + ((idx * LOG_BUFFER_SIZE) / 2))
-
-        reglist = self._modbus.read_input_registers(bufferaddr - 1, int(LOG_BUFFER_SIZE / 2))
-
-        # decode register list to string using minimalmodbus helper functions
-        bytestring = minimalmodbus._valuelist_to_bytestring(reglist, int(LOG_BUFFER_SIZE / 2))
-        print(minimalmodbus._bytestring_to_textstring(bytestring, int(LOG_BUFFER_SIZE / 2)))
-
     def _addToBuffer(self, idx) -> None:  # type: ignore
         bufferaddr = int(MODBUS_INPUT_LOGBUF_ADDR + ((idx * LOG_BUFFER_SIZE) / 2))
 
@@ -75,7 +66,10 @@ class StablModbus(StablDatasource):
         # decode register list to string using minimalmodbus helper functions
         bytestring = minimalmodbus._valuelist_to_bytestring(reglist, int(LOG_BUFFER_SIZE / 2))
         message = minimalmodbus._bytestring_to_textstring(bytestring, int(LOG_BUFFER_SIZE / 2))
-        self._buffer.put(message)
+        message = message.replace("\0", "")
+        self._buffer.put(
+            GenericMessage(content=message.strip(), datasource=Datasource.Modbus, classification=MessageType.other)
+        )
 
     def run(self) -> None:
         self.running = True

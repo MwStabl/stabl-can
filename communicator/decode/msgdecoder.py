@@ -6,6 +6,7 @@ import can
 from termcolor import colored
 
 from communicator.common.codebook import Devices
+from communicator.streams.datasource import MessageType
 
 msgs_from_master = {
     0x24: {
@@ -40,12 +41,6 @@ msgs_from_module = {
 }
 
 
-class MsgType(Enum):
-    healthcare = "healthcare"
-    heartbeat = "heartbeat"
-    other = "other"
-
-
 class StablCanMsg:
     def __init__(self, message: can.Message):
         self._message = message
@@ -58,7 +53,7 @@ class StablCanMsg:
         self.dlc = message.dlc
         self.timestamp: datetime = datetime.fromtimestamp(message.timestamp)
         self.annotation = decode(self)
-        self.type: MsgType = get_message_type(self)
+        self.type: MessageType = get_message_type(self)
 
     def __repr__(self) -> str:
         return visualise(self)
@@ -74,13 +69,13 @@ def decode(message: StablCanMsg) -> Optional[str]:
         return None
 
 
-def get_message_type(message: StablCanMsg) -> MsgType:
-    msg_type = MsgType.other
+def get_message_type(message: StablCanMsg) -> MessageType:
+    msg_type = MessageType.other
     try:
         if message.arbitration_id & 0b00111000000:
-            msg_type = MsgType.healthcare
+            msg_type = MessageType.healthcare
         if len(message.data) == 1 and message.data[0] == 0x28:
-            msg_type = MsgType.heartbeat
+            msg_type = MessageType.heartbeat
     except KeyError:
         pass
     return msg_type

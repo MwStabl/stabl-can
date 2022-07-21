@@ -1,4 +1,4 @@
 stream:
   uart_over_can:
-    serial_device: '/dev/ttyUOC'
+    serial_device: '/dev/ttyUSB0'
     port: 38400

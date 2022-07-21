@@ -1,7 +1,7 @@
 from serial import Serial
 from yaml import safe_load
 
-from communicator.streams.datasource import StablDatasource
+from communicator.streams.datasource import Datasource, GenericMessage, MessageType, StablDatasource
 
 
 def get_config() -> dict:
@@ -18,14 +18,20 @@ class StablUartOverCan(StablDatasource):
 
     def _create_serial(self) -> Serial:
         return Serial(
-            baudrate=self._config.get("baudrate", 38400), port=self._config.get("serial_device", "/dev/ttyUOC")
+            baudrate=self._config.get("baudrate", 38400),
+            port=self._config.get("serial_device", "/dev/ttyUOC"),
+            timeout=1,
         )
 
     def run(self) -> None:
         self._running = True
         while self._running:
             try:
-                self._buffer.put(self._serial.read_until().decode().strip())
+                new_msg = self._serial.read_until().decode().strip()
+                if new_msg:
+                    self._buffer.put(
+                        GenericMessage(content=new_msg, classification=MessageType.other, datasource=Datasource.UoC)
+                    )
             except TypeError as e:
                 pass
 

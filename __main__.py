@@ -17,7 +17,7 @@ class Communicator(Cmd):
     def __init__(self, require_canbus, require_modbus, require_uoc):
         super().__init__()
         self.logger = StablLogger()
-        self.output_file = Path("logs")/f"{datetime.now().strftime('%Y_%m_%d-%H_%M_%S')}.log"
+        self.output_file = Path("logs") / f"{datetime.now().strftime('%Y_%m_%d-%H_%M_%S')}.log"
         self._collector = Collector(self.logger.logfile, require_canbus, require_modbus, require_uoc)
         self._collector.start()
         self._command_map = {
@@ -31,6 +31,9 @@ class Communicator(Cmd):
             ":uoc off": self._uoc_off,
             ":modbus on": self._modbus_on,
             ":modbus off": self._modbus_off,
+            ":log on": self._log_on,
+            ":log off": self._log_off,
+            ":c": self._clear_output,
         }
 
     def run_until_terminated(self):
@@ -63,17 +66,27 @@ class Communicator(Cmd):
     def _modbus_off(self, inp) -> Optional[bool]:
         ...
 
+    def _log_on(self, inp) -> Optional[bool]:
+        ...
+
+    def _log_off(self, inp) -> Optional[bool]:
+        ...
+
+    def _clear_output(self, inp) -> Optional[bool]:
+        print(chr(27) + "[2J")
+        return None
+
     def terminate(self) -> None:
         self._collector.terminate()
         self._collector.join()
         self.fancyfy_saving()
 
     def fancyfy_saving(self) -> None:
-        safe = input("Safe Logfile? [Y/n]")
+        safe = input("Safe Logfile? [Y/n]: ")
         if safe == "n":
             self.output_file.unlink(missing_ok=True)
         else:
-            new_name = input("Rename it to something fancy? (leave empty for boring timestamp)")
+            new_name = input("Rename it to something fancy? (leave empty for boring timestamp): ")
             if not new_name == "":
                 self.output_file.rename(f"{new_name}.log")
 
