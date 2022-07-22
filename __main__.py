@@ -8,6 +8,7 @@ import click
 
 from communicator.common.logger import StablLogger
 from communicator.streams.collector import Collector
+from communicator.streams.filter import MsgFilters
 
 
 class Communicator(Cmd):
@@ -43,34 +44,44 @@ class Communicator(Cmd):
             pass
 
     def _hc_on(self, inp) -> Optional[bool]:
-        ...
+        self._collector.message_filter.deactivate_filter(MsgFilters.suppress_hc)
+        return None
 
     def _hc_off(self, inp) -> Optional[bool]:
-        ...
+        self._collector.message_filter.activate_filter(MsgFilters.suppress_hc)
+        return None
 
     def _can_on(self, inp) -> Optional[bool]:
-        ...
+        self._collector.message_filter.deactivate_filter(MsgFilters.suppress_can)
+        return None
 
     def _can_off(self, inp) -> Optional[bool]:
-        ...
+        self._collector.message_filter.activate_filter(MsgFilters.suppress_can)
+        return None
 
     def _uoc_on(self, inp) -> Optional[bool]:
-        ...
+        self._collector.message_filter.deactivate_filter(MsgFilters.suppress_uoc)
+        return None
 
     def _uoc_off(self, inp) -> Optional[bool]:
-        ...
+        self._collector.message_filter.activate_filter(MsgFilters.suppress_uoc)
+        return None
 
     def _modbus_on(self, inp) -> Optional[bool]:
-        ...
+        self._collector.message_filter.deactivate_filter(MsgFilters.suppress_modbus)
+        return None
 
     def _modbus_off(self, inp) -> Optional[bool]:
-        ...
+        self._collector.message_filter.activate_filter(MsgFilters.suppress_modbus)
+        return None
 
     def _log_on(self, inp) -> Optional[bool]:
-        ...
+        self._collector.message_filter.deactivate_filter(MsgFilters.suppress_logging)
+        return None
 
     def _log_off(self, inp) -> Optional[bool]:
-        ...
+        self._collector.message_filter.activate_filter(MsgFilters.suppress_logging)
+        return None
 
     def _clear_output(self, inp) -> Optional[bool]:
         print(chr(27) + "[2J")

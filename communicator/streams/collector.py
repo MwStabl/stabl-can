@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 from pathlib import Path
-from queue import Queue
 from threading import Thread
 from time import sleep
-from typing import Dict, List
+from typing import Dict
 
 from termcolor import colored
 
@@ -10,6 +11,7 @@ from communicator.streams.canbus import StablCanBus
 from communicator.streams.datasource import Datasource, GenericMessage, MessageType, StablDatasource
 from communicator.streams.modbus import StablModbus
 from communicator.streams.uart_over_can import StablUartOverCan
+from communicator.streams.filter import MsgFilters, MessageFilter
 
 
 class NoSources(Exception):
@@ -26,8 +28,12 @@ class Collector(Thread):
         self._logfile = logfile
         self._global_buffer: list = []
         self._sources = self._get_sources(canbus, modbus, uoc)
-        self._visualisation = Visualisation()
         self._running = False
+        self._message_filter = MessageFilter()
+
+    @property
+    def message_filter(self) -> MessageFilter:
+        return self._message_filter
 
     @staticmethod
     def _get_sources(
@@ -79,7 +85,8 @@ class Collector(Thread):
                     new_msg: GenericMessage = source.get_new_message()
                     self._global_buffer.append(new_msg)
                     self.log_message(new_msg.content)
-                    print(self._visualisation.print_line(new_msg))
+                    if not self._message_filter.suppress(new_msg):
+                        print(print_line(new_msg))
             sleep(0.01)
 
     def log_message(self, message: str) -> None:
@@ -94,15 +101,14 @@ class Collector(Thread):
             source.join()
 
 
-class Visualisation:
-    def __init__(self) -> None:
-        self._filters = ...
-
-    def print_line(self, message: GenericMessage) -> str:
-        printout = f"{message.datasource.value}: {message.content}"
-        if message.classification == MessageType.healthcare:
-            printout = colored(printout, "green")
-        return printout
-
-    def reprint_all(self) -> None:
-        ...
+def print_line(message: GenericMessage) -> str:
+    printout = f"{message.datasource.value}: {message.content}"
+    if message.datasource == Datasource.UoC:
+        printout = colored(printout, None, "on_yellow")
+    elif message.datasource == Datasource.Canbus:
+        printout = colored(printout, None, "on_grey")
+    if message.classification == MessageType.healthcare:
+        printout = colored(printout, "green")
+    elif message.classification == MessageType.heartbeat:
+        printout = colored(printout, "cyan")
+    return printout
